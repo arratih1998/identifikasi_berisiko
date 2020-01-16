@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latihan/models/perilaku.dart';
 import 'package:latihan/services/api_service.dart';
+import 'package:latihan/sistem_pakar/identifikasi.dart';
 
 class DiagnosisScreen extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class DiagnosisScreen extends StatefulWidget {
 class RadioGroup {
   final int index;
   final String text;
+
   RadioGroup({this.index, this.text});
 }
 
@@ -27,6 +29,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   int no = 0;
   bool terpilih = false;
   Map<int, int> jawaban = new Map();
+  Identifikasi perhitungan;
 
   ViewState state = ViewState.welcome;
 
@@ -44,8 +47,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   }
 
   final List<RadioGroup> _levelList = [
-    RadioGroup(index: 1, text: "Iya, dia (anak) mengalami hal tersebut"), // 0
-    RadioGroup(index: 2, text: "Tidak, dia (anak) tidak mengalaminya"), // 1
+    RadioGroup(index: 1, text: "Iya, dia (anak) mengalami hal tersebut"), // 1
+    RadioGroup(index: 0, text: "Tidak, dia (anak) tidak mengalaminya"), // 0
   ];
 
   Widget _buildRadioButton() {
@@ -210,6 +213,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
       List<Widget> hasilPilih = [];
 
       jawaban.forEach((index, jawaban) {
+        if (jawaban == 0) return; // jika jawaban 0 tidak ditambahkan
         hasilPilih.add(Column(
           children: <Widget>[
             Row(
@@ -231,7 +235,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                _levelList[jawaban - 1].text,
+                _levelList[jawaban].text,
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     color: Colors.white,
@@ -274,7 +278,28 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               elevation: 10.0,
               shape: RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(10)),
-              onPressed: () {},
+              onPressed: () {
+                List<Perilaku> tempData = [];
+
+                jawaban.forEach((index, jawaban) {
+                  // jika jawaban IYA
+                  if (jawaban == 1) {
+                    tempData.add(data[index]);
+                  }
+                });
+
+                perhitungan = new Identifikasi(tempData);
+                perhitungan.hitungMB();
+                perhitungan.hitungMD();
+                perhitungan.hitungCF();
+                Tingkatan hasil = perhitungan.ambilHasil();
+                print("######_DiagnosisScreenState.determineView ${[
+                  hasil.nama
+                ]} ");
+                setState(() {
+                  state = ViewState.hasilProses;
+                });
+              },
               color: Colors.white70,
               textColor: Colors.white70,
               child: Text(
@@ -285,7 +310,46 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           ),
         ]);
     } else {
-      return <Widget>[];
+      return <Widget>[
+        Text(
+          "HASIL DIAGNOSA",
+          style: TextStyle(color: Colors.white, fontSize: 20.0),
+        ),
+        SizedBox(
+          height: 7.0,
+        ),
+        Text(
+          "Aplikasi sistem pakar berhasil menghitung kemungkinan kamu meaksd jh kdfksjdahfkasjhdf kajshdf kajhsdkf hasdk f, Berikut hasilnya:",
+          style: TextStyle(color: Colors.white, fontSize: 20.0),
+        ),
+        SizedBox(
+          height: 12.0,
+        ),
+        Text(
+          perhitungan.ambilHasil().nama,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 114.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
+        ),
+        SizedBox(
+          height: 4.0,
+        ),
+        Text(
+          "Dengan tingkat kemungkinan",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12.0, color: Colors.white),
+        ),
+        Text(
+          perhitungan.nilaiCF.toString(),
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 15.0, color: Colors.white),
+        ),
+        SizedBox(
+          height: 12.0,
+        ),
+      ];
     }
   }
 
