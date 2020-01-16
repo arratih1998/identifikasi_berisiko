@@ -3,7 +3,15 @@ import 'dart:convert';
 class Perilaku {
   String kode;
   String perilaku;
-  double md, mb;
+  String md, mb;
+
+  double getMD() {
+    return double.parse(md);
+  }
+
+  double getMB() {
+    return double.parse(mb);
+  }
 
   Perilaku({this.kode, this.perilaku, this.mb, this.md});
 
