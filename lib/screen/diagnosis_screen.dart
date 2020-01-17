@@ -47,8 +47,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   }
 
   final List<RadioGroup> _levelList = [
-    RadioGroup(index: 1, text: "Iya, dia (anak) mengalami hal tersebut"), // 1
     RadioGroup(index: 0, text: "Tidak, dia (anak) tidak mengalaminya"), // 0
+    RadioGroup(index: 1, text: "Iya, dia (anak) mengalami hal tersebut"), // 1
   ];
 
   Widget _buildRadioButton() {
