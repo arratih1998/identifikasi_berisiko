@@ -24,6 +24,10 @@ class Identifikasi {
       Tingkatan("Rendah", RangeValues(0.2, 0.39)),
       Tingkatan("Sangat Rendah", RangeValues(0.0, 0.19)),
     ];
+
+    listPerilaku.map((d) {
+      print("######Identifikasi.Identifikasi MB MD ${[d.getMB(), d.getMD()]} ");
+    }).toList();
   }
 
   void hitungMB() {
@@ -31,13 +35,23 @@ class Identifikasi {
     int index = 0;
     listPerilaku.forEach((d) {
       if (index == 0) {
+        print("######Identifikasi hitung MB ${[
+          listPerilaku[index].getMB(),
+          listPerilaku[index + 1].getMB(),
+          listPerilaku[index].getMB()
+        ]} ");
         nilaiMBAkhir = listPerilaku[index].getMB() +
             listPerilaku[index + 1].getMB() * (1 - listPerilaku[index].getMB());
-        print("######Identifikasi.hitungMB ${[nilaiMBAkhir, index]} ");
+        print("######Identifikasi  hasil MB ${[nilaiMBAkhir, index]} ");
       } else if (index < listPerilaku.length - 1) {
+        print("######Identifikasi hitung MB ${[
+          nilaiMBAkhir,
+          listPerilaku[index + 1].getMB(),
+          nilaiMBAkhir
+        ]} ");
         nilaiMBAkhir =
             nilaiMBAkhir + listPerilaku[index + 1].getMB() * (1 - nilaiMBAkhir);
-        print("######Identifikasi.hitungMB ${[nilaiMBAkhir, index]} ");
+        print("######Identifikasi  hasil MB ${[nilaiMBAkhir, index]} ");
       }
       index++;
     });
@@ -49,13 +63,23 @@ class Identifikasi {
     int index = 0;
     listPerilaku.forEach((d) {
       if (index == 0) {
+        print("######Identifikasi hitung MD ${[
+          listPerilaku[index].getMD(),
+          listPerilaku[index + 1].getMD(),
+          listPerilaku[index].getMD()
+        ]} ");
         nilaiMDAkhir = listPerilaku[index].getMD() +
             listPerilaku[index + 1].getMD() * (1 - listPerilaku[index].getMD());
-        print("######Identifikasi.hitungMD ${[nilaiMDAkhir, index]} ");
+        print("######Identifikasi  hasil MD ${[nilaiMDAkhir, index]} ");
       } else if (index < listPerilaku.length - 1) {
+        print("######Identifikasi hitung MD ${[
+          nilaiMDAkhir,
+          listPerilaku[index + 1].getMD(),
+          nilaiMDAkhir
+        ]} ");
         nilaiMDAkhir =
             nilaiMDAkhir + listPerilaku[index + 1].getMD() * (1 - nilaiMDAkhir);
-        print("######Identifikasi.hitungMD ${[nilaiMDAkhir, index]} ");
+        print("######Identifikasi  hasil MD ${[nilaiMDAkhir, index]} ");
       }
       index++;
     });
