@@ -52,6 +52,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   ];
 
   Widget _buildRadioButton() {
+    terpilih = true; // DONT FORGET
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: _levelList
@@ -63,7 +64,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     child: Radio(
                       activeColor: Colors.white,
                       value: level.index,
-                      groupValue: indexTerpilih,
+                      groupValue: 0, // DONT FORGET
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       onChanged: (value) {
                         setState(() {
@@ -319,19 +320,17 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           height: 7.0,
         ),
         Text(
-          "Aplikasi sistem pakar berhasil menghitung kemungkinan kamu meaksd jh kdfksjdahfkasjhdf kajshdf kajhsdkf hasdk f, Berikut hasilnya:",
+          "Aplikasi sistem pakar berhasil menghitung kemungkinan berdasarkan perilaku yang dipilih YA, Berikut hasilnya:",
           style: TextStyle(color: Colors.white, fontSize: 20.0),
         ),
         SizedBox(
-          height: 12.0,
+          height: 120.0,
         ),
         Text(
           perhitungan.ambilHasil().nama,
           textAlign: TextAlign.center,
           style: TextStyle(
-              fontSize: 114.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white),
+              fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(
           height: 4.0,
@@ -339,15 +338,20 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
         Text(
           "Dengan tingkat kemungkinan",
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12.0, color: Colors.white),
+          style: TextStyle(fontSize: 15.0, color: Colors.white),
         ),
         Text(
           perhitungan.nilaiCF.toString(),
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 15.0, color: Colors.white),
+          style: TextStyle(fontSize: 19.0, color: Colors.white),
         ),
         SizedBox(
-          height: 12.0,
+          height: 30.0,
+        ),
+        Text(
+          "Terimakasih sudah menggunakan Aplikasi DIA-risk, Screenshot hasil ini, karena aplikasi belum update fitur histori Identifikasi.",
+          style: TextStyle(color: Colors.white),
+          textAlign: TextAlign.center,
         ),
       ];
     }
@@ -358,8 +362,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           context: context,
           builder: (context) => new AlertDialog(
             title: new Text('Apakah Anda yakin?'),
-            content: new Text(
-                'Jika keluar, maka proses identifikasi selesai, tanpa menyimpan!'),
+            content: new Text('Jika keluar, maka proses identifikasi selesai'),
             actions: <Widget>[
               new FlatButton(
                 onPressed: () => Navigator.of(context).pop(true),

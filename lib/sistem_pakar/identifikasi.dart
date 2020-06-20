@@ -18,11 +18,19 @@ class Identifikasi {
 
   Identifikasi(this.listPerilaku) {
     tingkatan = <Tingkatan>[
-      Tingkatan("Sangat Tinggi", RangeValues(0.8, 1.0)),
-      Tingkatan("Tinggi", RangeValues(0.6, 0.79)),
-      Tingkatan("Sedang", RangeValues(0.4, 0.59)),
-      Tingkatan("Rendah", RangeValues(0.2, 0.39)),
-      Tingkatan("Sangat Rendah", RangeValues(0.0, 0.19)),
+      Tingkatan(
+          "Sangat Tinggi untuk berisiko, sayangi DIA lebih dari biasanya, jika perlu bawa DIA ke psikiater ",
+          RangeValues(0.8, 1.0)),
+      Tingkatan("Tinggi untuk berisiko, sayangi DIA lebih dari biasanya, ",
+          RangeValues(0.6, 0.79)),
+      Tingkatan(
+          "Sedang untuk berisiko, namun kemungkinan untuk DIA sedikit lagi berisiko",
+          RangeValues(0.4, 0.59)),
+      Tingkatan("Rendah untuk berisiko, namun tetap sayangi dan support DIA",
+          RangeValues(0.2, 0.39)),
+      Tingkatan(
+          "Sangat Rendah untuk berisiko, namun tetap sayangi DIA ya. Selalu. ",
+          RangeValues(0.0, 0.19)),
     ];
 
     listPerilaku.map((d) {
