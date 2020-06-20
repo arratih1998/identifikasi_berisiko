@@ -11,9 +11,9 @@ class Tingkatan {
 
 class Identifikasi {
   List<Perilaku> listPerilaku;
-  double nilaiMB;
-  double nilaiMD;
-  double nilaiCF;
+  double nilaiMB = 0.0;
+  double nilaiMD = 0.0;
+  double nilaiCF = 0.0;
   List<Tingkatan> tingkatan;
 
   Identifikasi(this.listPerilaku) {
@@ -39,7 +39,7 @@ class Identifikasi {
   }
 
   void hitungMB() {
-    double nilaiMBAkhir;
+    double nilaiMBAkhir = 0;
     int index = 0;
     listPerilaku.forEach((d) {
       if (index == 0) {
@@ -67,7 +67,7 @@ class Identifikasi {
   }
 
   void hitungMD() {
-    double nilaiMDAkhir;
+    double nilaiMDAkhir = 0;
     int index = 0;
     listPerilaku.forEach((d) {
       if (index == 0) {
@@ -91,17 +91,20 @@ class Identifikasi {
       }
       index++;
     });
-    nilaiMD = nilaiMDAkhir;
+    nilaiMD = nilaiMDAkhir / (listPerilaku.length / 3);
   }
 
   void hitungCF() {
-    nilaiCF = nilaiMB - nilaiMD;
+    if (nilaiMB != 0.0 || nilaiMD != 0.0) nilaiCF = (nilaiMB - nilaiMD);
     print("######Identifikasi.hitungCF ${[nilaiCF]} ");
   }
 
   Tingkatan ambilHasil() {
     Tingkatan hasil = Tingkatan("ERROR", RangeValues(0, 0));
+    if (nilaiCF.isNaN) nilaiCF = 0.0;
+
     tingkatan.map((tingkatan) {
+      print("#########" + nilaiCF.toString());
       if (nilaiCF >= tingkatan.range.start && nilaiCF <= tingkatan.range.end) {
         hasil = tingkatan;
       }

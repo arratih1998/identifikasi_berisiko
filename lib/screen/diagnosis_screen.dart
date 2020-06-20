@@ -52,7 +52,6 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   ];
 
   Widget _buildRadioButton() {
-    terpilih = true; // DONT FORGET
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: _levelList
@@ -64,7 +63,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     child: Radio(
                       activeColor: Colors.white,
                       value: level.index,
-                      groupValue: 0, // DONT FORGET
+                      groupValue: indexTerpilih, // DONT FORGET
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       onChanged: (value) {
                         setState(() {
