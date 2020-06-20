@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../models/perilaku.dart';
 
-class Tingkatan {
+class TingkatanKepercayaan {
   String nama;
   RangeValues range;
+  int level;
 
-  Tingkatan(this.nama, this.range);
+  TingkatanKepercayaan(this.nama, this.range, this.level);
+}
+
+class TingkatanRisiko {
+  String nama;
+  int level;
+
+  TingkatanRisiko(this.nama, this.level);
 }
 
 class Identifikasi {
@@ -14,23 +22,30 @@ class Identifikasi {
   double nilaiMB = 0.0;
   double nilaiMD = 0.0;
   double nilaiCF = 0.0;
-  List<Tingkatan> tingkatan;
+  List<TingkatanKepercayaan> tingkatan;
 
   Identifikasi(this.listPerilaku) {
-    tingkatan = <Tingkatan>[
-      Tingkatan(
+    tingkatan = <TingkatanKepercayaan>[
+      TingkatanKepercayaan(
           "Sangat Tinggi untuk berisiko, sayangi DIA lebih dari biasanya, jika perlu bawa DIA ke psikiater ",
-          RangeValues(0.8, 1.0)),
-      Tingkatan("Tinggi untuk berisiko, sayangi DIA lebih dari biasanya, ",
-          RangeValues(0.6, 0.79)),
-      Tingkatan(
+          RangeValues(0.8, 1.0),
+          5),
+      TingkatanKepercayaan(
+          "Tinggi untuk berisiko, sayangi DIA lebih dari biasanya, ",
+          RangeValues(0.6, 0.79),
+          4),
+      TingkatanKepercayaan(
           "Sedang untuk berisiko, namun kemungkinan untuk DIA sedikit lagi berisiko",
-          RangeValues(0.4, 0.59)),
-      Tingkatan("Rendah untuk berisiko, namun tetap sayangi dan support DIA",
-          RangeValues(0.2, 0.39)),
-      Tingkatan(
+          RangeValues(0.4, 0.59),
+          3),
+      TingkatanKepercayaan(
+          "Rendah untuk berisiko, namun tetap sayangi dan support DIA",
+          RangeValues(0.2, 0.39),
+          2),
+      TingkatanKepercayaan(
           "Sangat Rendah untuk berisiko, namun tetap sayangi DIA ya. Selalu. ",
-          RangeValues(0.0, 0.19)),
+          RangeValues(0.0, 0.19),
+          1),
     ];
 
     listPerilaku.map((d) {
@@ -99,8 +114,9 @@ class Identifikasi {
     print("######Identifikasi.hitungCF ${[nilaiCF]} ");
   }
 
-  Tingkatan ambilHasil() {
-    Tingkatan hasil = Tingkatan("ERROR", RangeValues(0, 0));
+  TingkatanKepercayaan ambilHasil() {
+    TingkatanKepercayaan hasil =
+        TingkatanKepercayaan("ERROR", RangeValues(0, 0), 0);
     if (nilaiCF.isNaN) nilaiCF = 0.0;
 
     tingkatan.map((tingkatan) {

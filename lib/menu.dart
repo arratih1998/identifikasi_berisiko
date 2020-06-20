@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:latihan/screen/informasi_screen.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:latihan/screen/diagnosis_screen.dart';
+import 'package:latihan/screen/informasi_screen.dart';
 
 class HelloMenuScreen extends StatefulWidget {
   @override
@@ -38,22 +39,44 @@ class HelloMenuScreenState extends State<HelloMenuScreen> {
                 Padding(
                   padding: EdgeInsets.all(0.0),
                   child: Menu(
-                    "Apa Itu Anak Berisiko ?",
+                    "Informasi dan Berita ASD",
                     "assets/icon/icon1.png",
                     tapMenu: () {
-                      print("masuk menu apa itu anak berisiko");
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => InformasiScreen(kode: "1")),
+                          builder: (context) => WebviewScaffold(
+                            url:
+                                "https://auticare.id/category/autism-awareness",
+                            appBar: new AppBar(
+                              title: new Text("Informasi dan Berita ASD"),
+                            ),
+                          ),
+                        ),
                       );
                     },
                   ),
-                ), //menu 2
+                ),
                 Padding(
                   padding: EdgeInsets.all(0.0),
                   child: Menu(
-                    "Ciri anak Berisiko",
+                    "Diagnosis ASD",
+                    "assets/icon/icon4.jpg",
+                    tapMenu: () {
+                      print("masuk menu diagnosis anak berisiko");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DiagnosisScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(0.0),
+                  child: Menu(
+                    "History Diagnosis",
                     "assets/icon/icon2.jpg",
                     tapMenu: () {
                       print("masuk menu ciri anak berisiko");
@@ -69,7 +92,7 @@ class HelloMenuScreenState extends State<HelloMenuScreen> {
                 Padding(
                   padding: EdgeInsets.all(0.0),
                   child: Menu(
-                    "Faktor penyebab berisiko",
+                    "Profil Pengguna",
                     "assets/icon/icon3.jpg",
                     tapMenu: () {
                       print("masuk menu faktor penyebab berisiko");
@@ -83,24 +106,25 @@ class HelloMenuScreenState extends State<HelloMenuScreen> {
                     },
                   ),
                 ),
-                //menu 4
-                Padding(
-                  padding: EdgeInsets.all(0.0),
-                  child: Menu(
-                    "Diagnosis Anak Berisiko",
-                    "assets/icon/icon4.jpg",
-                    tapMenu: () {
-                      print("masuk menu diagnosis anak berisiko");
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DiagnosisScreen()),
-                      );
-                    },
-                  ),
-                ),
               ],
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 58.0),
+              child: Menu(
+                "Tentang Aplikasi",
+                "assets/icon/icon3.jpg",
+                tapMenu: () {
+                  print("masuk menu faktor penyebab berisiko");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => InformasiScreen(
+                              kode: "3",
+                            )),
+                  );
+                },
+              ),
+            )
           ],
         ),
       ),
@@ -115,6 +139,7 @@ class Menu extends StatelessWidget {
   GestureTapCallback tapMenu;
 
   Menu(this.namaMenu, this.logoMenu, {this.tapMenu});
+
   @override
   Widget build(BuildContext context) {
     var boxDecoration = BoxDecoration(

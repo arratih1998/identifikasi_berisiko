@@ -1,8 +1,15 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:latihan/models/penanganan.dart';
 import 'package:latihan/models/perilaku.dart';
 import 'package:latihan/services/api_service.dart';
 import 'package:latihan/sistem_pakar/identifikasi.dart';
+import 'package:latihan/utils/dialog.dart';
+import 'package:latihan/utils/validator.dart';
+import 'package:styled_text/styled_text.dart';
+
+import '../sistem_pakar/identifikasi.dart';
 
 class DiagnosisScreen extends StatefulWidget {
   @override
@@ -17,6 +24,7 @@ class RadioGroup {
 }
 
 enum ViewState {
+  initialize,
   welcome,
   pertanyaan,
   review,
@@ -24,7 +32,12 @@ enum ViewState {
 }
 
 class _DiagnosisScreenState extends State<DiagnosisScreen> {
-  List<Perilaku> data;
+  final _formInit = GlobalKey<FormState>();
+  final _focusNode = FocusScopeNode();
+  String _name;
+  String _age;
+  List<Perilaku> _data;
+  Penanganan _penanganan;
   int index = 0;
   int no = 0;
   bool terpilih = false;
@@ -35,14 +48,22 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   int indexTerpilih = -1;
 
+  List _listAge = ["2 - 3 tahun", "4 - 5 tahun"];
+
   @override
   Future initState() {
-    ambilData();
     super.initState();
   }
 
-  Future ambilData() async {
-    data = await ApiServices().getPerilaku();
+  Future _getPenanganan(
+      int bagian, int levelRisiko, int levelKepercayaan) async {
+    _penanganan = await ApiServices()
+        .getPenanganan(bagian, levelRisiko, levelKepercayaan);
+    setState(() {});
+  }
+
+  Future ambilData(int bagian) async {
+    _data = await ApiServices().getPerilaku(bagian);
     setState(() {});
   }
 
@@ -63,7 +84,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     child: Radio(
                       activeColor: Colors.white,
                       value: level.index,
-                      groupValue: indexTerpilih, // DONT FORGET
+                      groupValue: indexTerpilih,
+                      // DONT FORGET
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       onChanged: (value) {
                         setState(() {
@@ -98,6 +120,152 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   List<Widget> determineView() {
     if (state == ViewState.welcome) {
+      return <Widget>[
+        Text(
+          "Selamat datang di halaman Diagnosis ASD",
+          style: TextStyle(
+            fontSize: 19.0,
+            color: Colors.white70,
+          ),
+          textAlign: TextAlign.center,
+          textDirection: TextDirection.ltr,
+        ),
+        SizedBox(
+          height: 18.0,
+        ),
+        FocusScope(
+          node: _focusNode,
+          child: Form(
+            key: _formInit,
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 80.0,
+                      child: Text(
+                        "Nama Anak: ",
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                    Flexible(
+                      child: TextFormField(
+                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: Validator.noEmptyValidator,
+                        textCapitalization: TextCapitalization.words,
+                        onChanged: (d) => _name = d,
+                        cursorColor: Colors.white,
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: "Nama",
+                          hintStyle: TextStyle(
+                            color: Colors.white54,
+                          ),
+                          enabledBorder: new UnderlineInputBorder(
+                            borderSide: new BorderSide(color: Colors.brown),
+                          ),
+                          focusedBorder: new UnderlineInputBorder(
+                            borderSide: new BorderSide(color: Colors.white),
+                          ),
+                          focusColor: Colors.white,
+                          fillColor: Colors.white,
+                          hoverColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 80.0,
+                      child: Text(
+                        "Umur Anak:\t ",
+                        style: TextStyle(fontSize: 16.0, color: Colors.white),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 8.0,
+                    ),
+                    Flexible(
+                      fit: FlexFit.tight,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 8.0),
+                        height: 64.0,
+                        child: DropdownButton(
+                          hint: Text(
+                            "Pilih Rentang Umur",
+                            style: TextStyle(color: Colors.white54),
+                          ),
+                          value: _age,
+                          onTap: () => _focusNode.unfocus(),
+                          dropdownColor: Colors.brown,
+                          items: _listAge.map((value) {
+                            return DropdownMenuItem(
+                              child: Text(
+                                value,
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              value: value,
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _age = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 50.0,
+        ),
+        SizedBox(
+          height: 50.0,
+          child: RaisedButton(
+            elevation: 4.0,
+            shape: RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(15)),
+            onPressed: () {
+              if (_age == null) {
+                MessageDialog("Diagnosis ASD",
+                        "Rentang umur harus diisi terlebih dahulu", context)
+                    .Show();
+                return;
+              }
+
+              if (_formInit.currentState.validate()) {
+                ambilData(_listAge.indexWhere((element) => element == _age));
+                setState(() {
+                  state = ViewState.pertanyaan;
+                });
+              }
+            },
+            color: Colors.white70,
+            textColor: Colors.white60,
+            child: Text(
+              "Mulai",
+              style: TextStyle(letterSpacing: 7.0, fontSize: 17.0),
+            ),
+          ),
+        )
+      ];
+    } else if (state == ViewState.welcome) {
       return <Widget>[
         Text(
           "Selamat Datang di Menu Identifikasi Anak berisiko, terdapat 20 perilaku dan 5 pilihan level. Baca dan teliti dalam melakukan identifikasi ini. Dalam identifikasi ini, terdapat beberapa perilaku anak di lingkungan sekolah pastikan Anda sebagai orang tua/wali sudah berkomunikasi dengan guru, begitu juga sebaliknya.",
@@ -142,11 +310,38 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
         )
       ];
     } else if (state == ViewState.pertanyaan) {
+      if (_data == null)
+        return <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height / 2,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 16.0,
+                  ),
+                  Text(
+                    "Memuat data...",
+                    style: TextStyle(
+                      fontSize: 19.0,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.justify,
+                    textDirection: TextDirection.ltr,
+                  ),
+                ],
+              ),
+            ),
+          )
+        ];
+
       return <Widget>[
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(data[no].kode + ".",
+            Text(_data[no].kode + ".",
                 style: TextStyle(
                   fontSize: 20.0,
                   color: Colors.white70,
@@ -155,7 +350,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               width: 5.0,
             ),
             Flexible(
-              child: Text(data[index].perilaku,
+              child: Text(_data[index].pertanyaan,
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.white70,
@@ -173,8 +368,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 borderRadius: new BorderRadius.circular(10)),
             onPressed: () {
               if (terpilih == true) {
-                if (index + 1 < data.length) {
-                  print("############ jawaban " + "${[jawaban]}");
+                if (index + 1 < _data.length) {
                   setState(() {
                     no++;
                     index++;
@@ -221,12 +415,12 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(data[index].kode + ". ",
+                  child: Text(_data[index].kode + ". ",
                       textAlign: TextAlign.left,
                       style: TextStyle(color: Colors.white, fontSize: 20.0)),
                 ),
                 Flexible(
-                  child: Text(data[index].perilaku,
+                  child: Text(_data[index].pertanyaan,
                       textAlign: TextAlign.left,
                       style: TextStyle(color: Colors.white, fontSize: 20.0)),
                 ),
@@ -284,7 +478,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 jawaban.forEach((index, jawaban) {
                   // jika jawaban IYA
                   if (jawaban == 1) {
-                    tempData.add(data[index]);
+                    tempData.add(_data[index]);
                   }
                 });
 
@@ -292,10 +486,14 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 perhitungan.hitungMB();
                 perhitungan.hitungMD();
                 perhitungan.hitungCF();
-                Tingkatan hasil = perhitungan.ambilHasil();
-                print("######_DiagnosisScreenState.determineView ${[
-                  hasil.nama
-                ]} ");
+                TingkatanKepercayaan hasil = perhitungan.ambilHasil();
+                _getPenanganan(
+                    _listAge.indexWhere((element) => element == _age),
+                    determineLevel(jawaban.entries
+                            .where((element) => element.value == 1)
+                            .length)
+                        .level,
+                    hasil.level);
                 setState(() {
                   state = ViewState.hasilProses;
                 });
@@ -310,47 +508,105 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           ),
         ]);
     } else {
+      if (_penanganan == null)
+        return <Widget>[
+          Container(
+            height: MediaQuery.of(context).size.height / 2,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 16.0,
+                  ),
+                  Text(
+                    "Menentukan penanganan...",
+                    style: TextStyle(
+                      fontSize: 19.0,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.justify,
+                    textDirection: TextDirection.ltr,
+                  ),
+                ],
+              ),
+            ),
+          )
+        ];
+
+      final answer = jawaban.entries.where((element) => element.value == 1);
+      int number = 0;
+
       return <Widget>[
         Text(
-          "HASIL DIAGNOSA",
-          style: TextStyle(color: Colors.white, fontSize: 20.0),
-        ),
-        SizedBox(
-          height: 7.0,
-        ),
-        Text(
-          "Aplikasi sistem pakar berhasil menghitung kemungkinan berdasarkan perilaku yang dipilih YA, Berikut hasilnya:",
-          style: TextStyle(color: Colors.white, fontSize: 20.0),
-        ),
-        SizedBox(
-          height: 120.0,
-        ),
-        Text(
-          perhitungan.ambilHasil().nama,
+          "HASIL DIAGNOSIS",
           textAlign: TextAlign.center,
           style: TextStyle(
-              fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),
+              color: Colors.white, fontSize: 24.0, fontWeight: FontWeight.bold),
         ),
         SizedBox(
-          height: 4.0,
+          height: 16.0,
         ),
         Text(
-          "Dengan tingkat kemungkinan",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 15.0, color: Colors.white),
-        ),
-        Text(
-          perhitungan.nilaiCF.toString(),
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 19.0, color: Colors.white),
+          "$_name mengalami gejala:",
+          style: TextStyle(color: Colors.white, fontSize: 20.0),
         ),
         SizedBox(
-          height: 30.0,
+          height: 12.0,
+        ),
+        Column(
+          children: answer.map((d) {
+            number++;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(number.toString() + ". ",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(color: Colors.white, fontSize: 20.0)),
+                  ),
+                  Flexible(
+                    child: Text(_data[d.key].gejala,
+                        textAlign: TextAlign.left,
+                        style: TextStyle(color: Colors.white, fontSize: 20.0)),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+        SizedBox(
+          height: 12.0,
+        ),
+        StyledText(
+          text: 'Berdasarkan gejala tersebut, risiko yang dialami adalah <bold>'
+              '${determineLevel(answer.length).nama}</bold>. Dengan nilai '
+              'kepercayaan <bold>${perhitungan.nilaiCF.toString()}</bold>',
+          style: TextStyle(
+              fontSize: 20.0, color: Colors.white, fontStyle: FontStyle.italic),
+          styles: {
+            'bold': TextStyle(fontWeight: FontWeight.bold),
+          },
+        ),
+        SizedBox(
+          height: 18.0,
         ),
         Text(
-          "Terimakasih sudah menggunakan Aplikasi DIA-risk, Screenshot hasil ini, karena aplikasi belum update fitur histori Identifikasi.",
-          style: TextStyle(color: Colors.white),
-          textAlign: TextAlign.center,
+          "Beberapa solusi yang dapat dilakukan di rumah:",
+          style: TextStyle(fontSize: 20.0, color: Colors.white),
+          textAlign: TextAlign.left,
+        ),
+        SizedBox(
+          height: 18.0,
+        ),
+        Text(
+          _penanganan.isi,
+          style: TextStyle(fontSize: 20.0, color: Colors.white),
+          textAlign: TextAlign.left,
         ),
       ];
     }
@@ -379,16 +635,11 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (data == null)
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Identifikasi Anak Berisiko"),
+          title: Text("Diagnosis ASD"),
           backgroundColor: Colors.brown,
         ),
         body: Container(
@@ -406,10 +657,24 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
               borderRadius: BorderRadius.circular(30.0),
               color: Colors.black54,
             ),
-            child: ListView(children: determineView()),
+            child: ListView(
+                padding: EdgeInsets.symmetric(vertical: 4.0),
+                physics: BouncingScrollPhysics(),
+                children: determineView()),
           ),
         ),
       ),
     );
+  }
+
+  TingkatanRisiko determineLevel(int length) {
+    TingkatanRisiko result;
+    if (length >= 9)
+      result = TingkatanRisiko("Risiko Tinggi", 3);
+    else if (length >= 4)
+      result = TingkatanRisiko("Risiko Sedang", 2);
+    else if (length >= 1) result = TingkatanRisiko("Risiko Rendah", 1);
+
+    return result;
   }
 }

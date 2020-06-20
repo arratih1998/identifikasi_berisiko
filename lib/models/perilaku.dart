@@ -2,7 +2,8 @@ import 'dart:convert';
 
 class Perilaku {
   String kode;
-  String perilaku;
+  String pertanyaan;
+  String gejala;
   String md, mb;
 
   double getMD() {
@@ -13,12 +14,13 @@ class Perilaku {
     return double.parse(mb);
   }
 
-  Perilaku({this.kode, this.perilaku, this.mb, this.md});
+  Perilaku({this.kode, this.pertanyaan, this.gejala, this.mb, this.md});
 
   factory Perilaku.fromJson(Map<String, dynamic> map) {
     return Perilaku(
-        kode: map["kode_perilaku"],
-        perilaku: map["perilaku"],
+        kode: map["kode_gejala"],
+        pertanyaan: map["pertanyaan"],
+        gejala: map["gejala"],
         mb: map["mb"],
         md: map["md"]);
   }

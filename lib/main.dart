@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latihan/menu.dart';
 import 'package:latihan/screen/informasi_screen.dart';
+import 'package:latihan/screen/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'menu.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,16 +15,31 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  SharedPreferences prefs;
+  bool alreadyLogin;
+
   @override
   void initState() {
+    init();
     super.initState();
+  }
+
+  init() async {
+    prefs = await SharedPreferences.getInstance();
+    alreadyLogin = await prefs.get("id_pengguna") != null;
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Latihan",
-      home: new HomeScreen(),
+      title: "Aplikasi DIA-Risk",
+      theme: ThemeData(primaryColor: Colors.brown),
+      home: alreadyLogin == null
+          ? Container(
+              color: Colors.white,
+              child: Center(child: CircularProgressIndicator()))
+          : alreadyLogin ? HelloMenuScreen() : LoginScreen(),
     );
   }
 }
