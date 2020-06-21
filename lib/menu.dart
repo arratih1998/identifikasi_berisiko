@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:latihan/screen/diagnosis_screen.dart';
+import 'package:latihan/screen/history_screen.dart';
 import 'package:latihan/screen/informasi_screen.dart';
 
 class HelloMenuScreen extends StatefulWidget {
@@ -83,7 +84,8 @@ class HelloMenuScreenState extends State<HelloMenuScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => InformasiScreen(kode: "2")),
+                          builder: (context) => HistoryScreen(),
+                        ),
                       );
                     },
                   ),

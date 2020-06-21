@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
+import 'package:latihan/models/history.dart';
 import 'package:latihan/models/informasi.dart';
 import 'package:latihan/models/penanganan.dart';
 import 'package:latihan/models/perilaku.dart';
@@ -30,11 +31,33 @@ class ApiServices {
     }
   }
 
-  Future<Penanganan> getPenanganan(
-      int bagian, int levelRisiko, int levelKepercayaan) async {
+  Future<List<History>> getHistory(int kodePengguna) async {
+    final response = await client
+        .get("$baseUrl/get_history.php?kode_pengguna=$kodePengguna");
+    if (response.statusCode == 200) {
+      return historyFromJson(response.body);
+    } else {
+      return null;
+    }
+  }
+
+  Future<Penanganan> getPenangananAddHistory(
+      int bagian, int levelRisiko, int levelKepercayaan,
+      {int kodePengguna,
+      String daftarGejala,
+      double nilaiCF,
+      String namaAnak,
+      String umur}) async {
+    String tambah = "";
+    if (daftarGejala != null)
+      tambah = "&kode_pengguna=$kodePengguna"
+          "&daftar_gejala=$daftarGejala&nilai_cf=$nilaiCF&namaanak="
+          "$namaAnak&umur=$umur";
+
     final response = await client
         .get("$baseUrl/get_penanganan.php?bagian=${bagian + 1}&level_risiko="
-            "$levelRisiko&level_kepercayaan=$levelKepercayaan");
+                "$levelRisiko&level_kepercayaan=$levelKepercayaan" +
+            tambah);
     if (response.statusCode == 200) {
       return Penanganan.fromJson(json.decode(response.body));
     } else {

@@ -28,6 +28,7 @@ dependencies:
   shared_preferences: ^0.5.7+3
   flutter_webview_plugin: ^0.3.11
   styled_text: ^1.0.1+1
+  intl: ^0.16.1
 
 dev_dependencies:
   flutter_test:

@@ -1,17 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:latihan/models/history.dart';
 import 'package:latihan/models/penanganan.dart';
 import 'package:latihan/models/perilaku.dart';
 import 'package:latihan/services/api_service.dart';
 import 'package:latihan/sistem_pakar/identifikasi.dart';
 import 'package:latihan/utils/dialog.dart';
 import 'package:latihan/utils/validator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:styled_text/styled_text.dart';
 
 import '../sistem_pakar/identifikasi.dart';
 
 class DiagnosisScreen extends StatefulWidget {
+  final History history;
+
+  const DiagnosisScreen({Key key, this.history}) : super(key: key);
+
   @override
   _DiagnosisScreenState createState() => _DiagnosisScreenState();
 }
@@ -52,17 +58,48 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
 
   @override
   Future initState() {
+    if (widget.history != null) {
+      state = ViewState.hasilProses;
+      _name = widget.history.namaanak;
+      _getHistoryData();
+    }
+
     super.initState();
   }
 
-  Future _getPenanganan(
-      int bagian, int levelRisiko, int levelKepercayaan) async {
-    _penanganan = await ApiServices()
-        .getPenanganan(bagian, levelRisiko, levelKepercayaan);
+  Future<void> _getHistoryData() async {
+    int bagian =
+        _listAge.indexWhere((element) => element == widget.history.umur);
+    List<String> kodeGejala = widget.history.daftar_gejala.split(",");
+    await ambilData(bagian);
+
+    kodeGejala.forEach((element) {
+      jawaban[int.parse(element)] = 1;
+    });
+
+    await _getPenanganan(bagian, determineLevel(kodeGejala.length).level,
+        getTingkatanResikoFromCF(widget.history.nilai_cf).level);
+  }
+
+  Future _getPenanganan(int bagian, int levelRisiko, int levelKepercayaan,
+      {String daftarGejala,
+      double nilaiCF,
+      String namaAnak,
+      String umur}) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int kodePengguna = prefs.get("id_pengguna");
+    _penanganan = await ApiServices().getPenangananAddHistory(
+        bagian, levelRisiko, levelKepercayaan,
+        kodePengguna: kodePengguna,
+        daftarGejala: daftarGejala,
+        nilaiCF: nilaiCF,
+        namaAnak: namaAnak,
+        umur: umur);
     setState(() {});
   }
 
   Future ambilData(int bagian) async {
+    await Future.delayed(Duration(seconds: 1));
     _data = await ApiServices().getPerilaku(bagian);
     setState(() {});
   }
@@ -157,7 +194,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     Flexible(
                       child: TextFormField(
                         textInputAction: TextInputAction.next,
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.text,
                         validator: Validator.noEmptyValidator,
                         textCapitalization: TextCapitalization.words,
                         onChanged: (d) => _name = d,
@@ -323,12 +360,12 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     height: 16.0,
                   ),
                   Text(
-                    "Memuat data...",
+                    "Menentukan gejala untuk umur $_age...",
                     style: TextStyle(
                       fontSize: 19.0,
                       color: Colors.white70,
                     ),
-                    textAlign: TextAlign.justify,
+                    textAlign: TextAlign.center,
                     textDirection: TextDirection.ltr,
                   ),
                 ],
@@ -487,13 +524,16 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                 perhitungan.hitungMD();
                 perhitungan.hitungCF();
                 TingkatanKepercayaan hasil = perhitungan.ambilHasil();
+                final answer =
+                    jawaban.entries.where((element) => element.value == 1);
                 _getPenanganan(
                     _listAge.indexWhere((element) => element == _age),
-                    determineLevel(jawaban.entries
-                            .where((element) => element.value == 1)
-                            .length)
-                        .level,
-                    hasil.level);
+                    determineLevel(answer.length).level,
+                    hasil.level,
+                    daftarGejala: answer.map((e) => e.key).toList().join(","),
+                    nilaiCF: perhitungan.nilaiCF,
+                    namaAnak: _name,
+                    umur: _age);
                 setState(() {
                   state = ViewState.hasilProses;
                 });
@@ -521,7 +561,9 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
                     height: 16.0,
                   ),
                   Text(
-                    "Menentukan penanganan...",
+                    widget.history != null
+                        ? "Memuat data..."
+                        : "Menentukan penanganan...",
                     style: TextStyle(
                       fontSize: 19.0,
                       color: Colors.white70,
@@ -585,7 +627,7 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
         StyledText(
           text: 'Berdasarkan gejala tersebut, risiko yang dialami adalah <bold>'
               '${determineLevel(answer.length).nama}</bold>. Dengan nilai '
-              'kepercayaan <bold>${perhitungan.nilaiCF.toString()}</bold>',
+              'kepercayaan <bold>${widget.history == null ? perhitungan.nilaiCF.toString() : widget.history.nilai_cf.toString()}</bold>',
           style: TextStyle(
               fontSize: 20.0, color: Colors.white, fontStyle: FontStyle.italic),
           styles: {
@@ -613,6 +655,8 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
   }
 
   Future<bool> _onWillPop() async {
+    if (widget.history != null) return true;
+
     return (await showDialog(
           context: context,
           builder: (context) => new AlertDialog(

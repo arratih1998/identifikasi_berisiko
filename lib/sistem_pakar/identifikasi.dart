@@ -17,6 +17,41 @@ class TingkatanRisiko {
   TingkatanRisiko(this.nama, this.level);
 }
 
+TingkatanKepercayaan getTingkatanResikoFromCF(double nilaiCF) {
+  final tingkatan = <TingkatanKepercayaan>[
+    TingkatanKepercayaan(
+        "Sangat Tinggi untuk berisiko, sayangi DIA lebih dari biasanya, jika perlu bawa DIA ke psikiater ",
+        RangeValues(0.8, 1.0),
+        5),
+    TingkatanKepercayaan(
+        "Tinggi untuk berisiko, sayangi DIA lebih dari biasanya, ",
+        RangeValues(0.6, 0.79),
+        4),
+    TingkatanKepercayaan(
+        "Sedang untuk berisiko, namun kemungkinan untuk DIA sedikit lagi berisiko",
+        RangeValues(0.4, 0.59),
+        3),
+    TingkatanKepercayaan(
+        "Rendah untuk berisiko, namun tetap sayangi dan support DIA",
+        RangeValues(0.2, 0.39),
+        2),
+    TingkatanKepercayaan(
+        "Sangat Rendah untuk berisiko, namun tetap sayangi DIA ya. Selalu. ",
+        RangeValues(0.0, 0.19),
+        1),
+  ];
+
+  TingkatanKepercayaan hasil;
+
+  tingkatan.map((tingkatan) {
+    if (nilaiCF >= tingkatan.range.start && nilaiCF <= tingkatan.range.end) {
+      hasil = tingkatan;
+    }
+  }).toList();
+
+  return hasil;
+}
+
 class Identifikasi {
   List<Perilaku> listPerilaku;
   double nilaiMB = 0.0;

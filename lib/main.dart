@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:latihan/menu.dart';
 import 'package:latihan/screen/informasi_screen.dart';
 import 'package:latihan/screen/login_screen.dart';
@@ -20,6 +21,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    initializeDateFormatting('en_ID', null);
     init();
     super.initState();
   }
