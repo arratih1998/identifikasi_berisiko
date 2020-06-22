@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:latihan/models/history.dart';
 import 'package:latihan/models/informasi.dart';
 import 'package:latihan/models/penanganan.dart';
+import 'package:latihan/models/pengguna.dart';
 import 'package:latihan/models/perilaku.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +17,15 @@ class ApiServices {
         await client.get("$baseUrl/get_information.php?kode=$kode");
     if (response.statusCode == 200) {
       return informasiFromJson(response.body);
+    } else {
+      return null;
+    }
+  }
+
+  Future<Pengguna> getPengguna(String kode) async {
+    final response = await client.get("$baseUrl/get_pengguna.php?kode=$kode");
+    if (response.statusCode == 200) {
+      return Pengguna.fromJson(json.decode(response.body));
     } else {
       return null;
     }

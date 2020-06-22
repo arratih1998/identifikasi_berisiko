@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latihan/screen/diagnosis_screen.dart';
 import 'package:latihan/screen/history_screen.dart';
 import 'package:latihan/screen/informasi_screen.dart';
+import 'package:latihan/screen/profil_screen.dart';
 
 class HelloMenuScreen extends StatefulWidget {
   @override
@@ -63,14 +65,20 @@ class HelloMenuScreenState extends State<HelloMenuScreen> {
                   child: Menu(
                     "Diagnosis ASD",
                     "assets/icon/icon4.jpg",
-                    tapMenu: () {
+                    tapMenu: () async {
                       print("masuk menu diagnosis anak berisiko");
-                      Navigator.push(
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => DiagnosisScreen(),
                         ),
                       );
+
+                      if (result ?? false) {
+                        Fluttertoast.showToast(
+                            msg: "Hasil diagnosis tersimpan pada history",
+                            toastLength: Toast.LENGTH_LONG);
+                      }
                     },
                   ),
                 ),
@@ -97,13 +105,9 @@ class HelloMenuScreenState extends State<HelloMenuScreen> {
                     "Profil Pengguna",
                     "assets/icon/icon3.jpg",
                     tapMenu: () {
-                      print("masuk menu faktor penyebab berisiko");
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => InformasiScreen(
-                                  kode: "3",
-                                )),
+                        MaterialPageRoute(builder: (context) => ProfilScreen()),
                       );
                     },
                   ),
@@ -121,7 +125,7 @@ class HelloMenuScreenState extends State<HelloMenuScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => InformasiScreen(
-                              kode: "3",
+                              kode: "1",
                             )),
                   );
                 },

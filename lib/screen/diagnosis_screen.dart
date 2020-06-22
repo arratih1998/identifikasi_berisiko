@@ -650,6 +650,20 @@ class _DiagnosisScreenState extends State<DiagnosisScreen> {
           style: TextStyle(fontSize: 20.0, color: Colors.white),
           textAlign: TextAlign.left,
         ),
+        RaisedButton(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(15)),
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+          color: Colors.white70,
+          textColor: Colors.white60,
+          child: Text(
+            "SELESAI",
+            style: TextStyle(letterSpacing: 7.0, fontSize: 17.0),
+          ),
+        ),
       ];
     }
   }
